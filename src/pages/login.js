@@ -65,7 +65,7 @@ const Login = () => {
       toast.success("You Have Been Logged");
 
       // Call createDocument to send user data to Appwrite database
-      await createDocument('<DATABASE_ID>', '<COLLECTION_ID>', {
+      await createDocument('679f10030008b232a34e', '679f1028002e27e88f5e', {
         username: loginInfo.username,
         name: loginInfo.name,
       });
