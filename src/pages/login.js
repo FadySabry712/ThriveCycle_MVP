@@ -32,7 +32,7 @@ const Login = () => {
         method: "post",
         url: "https://cloud.appwrite.io/v1",
         withCredentials: true,
-        headers: { "Content-Type": "application/json", credentials: "include" },
+        headers: { "Content-Type": "application/json"},
         data: JSON.stringify({ ...loginInfo, rc_score: percentage }),
       });
       console.log(data, "data");
@@ -57,7 +57,7 @@ const Login = () => {
         method: "post",
         url: "https://cloud.appwrite.io/v1",
         withCredentials: true,
-        headers: { "Content-Type": "application/json", credentials: "include" },
+        headers: { "Content-Type": "application/json"},
         data: JSON.stringify(loginInfo),
       });
 
