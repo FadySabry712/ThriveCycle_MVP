@@ -30,7 +30,7 @@ const Login = () => {
     try {
       const { data } = await axios({
         method: "post",
-        url: "https://cloud.appwrite.io/v1",
+        url: "https://cloud.appwrite.io/v1/databases/679f10030008b232a34e/collections/679f1028002e27e88f5e",
         withCredentials: true,
         headers: { "Content-Type": "application/json"},
         data: JSON.stringify({ ...loginInfo, rc_score: percentage }),
@@ -55,7 +55,7 @@ const Login = () => {
     try {
       const { data } = await axios({
         method: "post",
-        url: "https://cloud.appwrite.io/v1",
+        url: "https://cloud.appwrite.io/v1/databases/679f10030008b232a34e/collections/679f1028002e27e88f5e",
         withCredentials: true,
         headers: { "Content-Type": "application/json"},
         data: JSON.stringify(loginInfo),
