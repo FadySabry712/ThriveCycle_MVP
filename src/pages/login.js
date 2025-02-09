@@ -1,62 +1,46 @@
-import { Client, Account, ID } from "appwrite"; // Import necessary Appwrite components
-import { createDocument } from '../lib/appwrite_with_document'; // Import createDocument function
+import { Client, Account, ID } from "appwrite"; 
+import { createDocument } from '../lib/appwrite_with_document'; 
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const client = new Client();
+client
+  .setEndpoint(process.env.REACT_APP_API_URL) // Ensure correct env variable
+  .setProject("YOUR_PROJECT_ID");
+
 const account = new Account(client);
 
 const Login = () => {
-  const API_URL = process.env.API_URL;
   const navigate = useNavigate();
   const [registered, setRegistered] = useState(true);
-  const [loginInfo, setLoginInfo] = useState({
-    name: "",
-    username: "",
-    password: "",
-  });
-  const userInfo = JSON.parse(localStorage.getItem("userData"));
+  const [loginInfo, setLoginInfo] = useState({ name: "", username: "", password: "" });
 
   useEffect(() => {
-    if (!userInfo) {
-      return;
-    } else {
+    const userInfo = localStorage.getItem("userData");
+    if (userInfo) {
       navigate("/profile");
     }
   }, []);
 
   const register = async () => {
-    const number = Math.random();
-    const intiger = Math.floor(number * 100); // Ensure it's a valid integer
-
-    const percentage = intiger.toString().substring(0, 4);
+    const intiger = Math.floor(Math.random() * 100); 
     try {
-      console.log("Registering with data:", { name: loginInfo.name, username: loginInfo.username, password: loginInfo.password, rc_score: percentage });
+      console.log("Registering with data:", { name: loginInfo.name, username: loginInfo.username });
 
-const response = await createDocument({ 
-    user_id: intiger, 
-    user_name: loginInfo.username, 
-    password: loginInfo.password, 
-    name: loginInfo.name 
-});
-
-
-
+      const response = await createDocument({ 
+          user_id: intiger, 
+          user_name: loginInfo.username, 
+          name: loginInfo.name 
+      });
 
       console.log(response);
       toast.success("You Have Been Registered");
-      setLoginInfo({
-        name: "",
-        username: "",
-        password: "",
-      });
+      setLoginInfo({ name: "", username: "", password: "" });
       setRegistered(true);
-      return;
     } catch (error) {
-      const errorMessage = error.response && error.response.data ? error.response.data.message : "An error occurred during registration.";
-
-      toast.error(errorMessage);
+      console.error(error);
+      toast.error(error.message || "An error occurred during registration.");
     }
   };
 
@@ -64,11 +48,10 @@ const response = await createDocument({
     try {
       const response = await account.createEmailSession(loginInfo.username, loginInfo.password);
       localStorage.setItem("userData", JSON.stringify(response));
-      toast.success("You Have Been Logged");
+      toast.success("You Have Been Logged In");
       window.location.reload();
-      setRegistered(true);
-      return;
     } catch (error) {
+      console.error(error);
       toast.error("Incorrect username or password.");
     }
   };
@@ -80,69 +63,48 @@ const response = await createDocument({
           {!registered && (
             <input
               value={loginInfo.name}
-              onChange={(e) =>
-                setLoginInfo({ ...loginInfo, name: e.target.value })
-              }
+              onChange={(e) => setLoginInfo({ ...loginInfo, name: e.target.value })}
               type="text"
               placeholder="Name"
-              className="bg-transparent text-white placeholder:text-[#ffffff] outline-none border-b border-nuetral-40 pb-[7px] w-[100%]"
+              className="bg-transparent text-white placeholder:text-[#ffffff] outline-none border-b border-neutral-40 pb-[7px] w-[100%]"
             />
           )}
           <input
             value={loginInfo.username}
-            onChange={(e) =>
-              setLoginInfo({ ...loginInfo, username: e.target.value })
-            }
+            onChange={(e) => setLoginInfo({ ...loginInfo, username: e.target.value })}
             type="text"
             placeholder="Username"
-            className="bg-transparent text-white placeholder:text-[#ffffff] outline-none border-b border-nuetral-40 pb-[7px] w-[100%]"
+            className="bg-transparent text-white placeholder:text-[#ffffff] outline-none border-b border-neutral-40 pb-[7px] w-[100%]"
           />
           <input
             value={loginInfo.password}
-            onChange={(e) =>
-              setLoginInfo({ ...loginInfo, password: e.target.value })
-            }
+            onChange={(e) => setLoginInfo({ ...loginInfo, password: e.target.value })}
             type="password"
             placeholder="Password"
-            className="bg-transparent text-white placeholder:text-[#ffffff] outline-none border-b border-nuetral-400 pb-[7px] w-[100%]"
+            className="bg-transparent text-white placeholder:text-[#ffffff] outline-none border-b border-neutral-400 pb-[7px] w-[100%]"
           />
-          {registered && (
+          {registered ? (
             <button
-              onClick={() => login()}
+              onClick={login}
               className="text-white bg-[#21c78f] p-2 rounded-md shadow-xl hover:scale-110 transition-all ease-in-out"
             >
               Login
             </button>
-          )}
-          {!registered && (
+          ) : (
             <button
-              onClick={() => register()}
+              onClick={register}
               className="text-white bg-[#21c78f] p-2 rounded-md shadow-xl hover:scale-110 transition-all ease-in-out"
             >
               Register
             </button>
           )}
-          {registered && (
-            <p
-              className="text-white text-[16px]"
-              onClick={() => {
-                setRegistered(!registered);
-              }}
-            >
-              New user?<span className="underline cursor-pointer">Sign Up</span>
-            </p>
-          )}
-          {!registered && (
-            <p
-              className="text-white text-[16px]"
-              onClick={() => {
-                setRegistered(!registered);
-              }}
-            >
-              Existing User?{" "}
-              <span className="underline cursor-pointer">Sign in</span>
-            </p>
-          )}
+          <p
+            className="text-white text-[16px]"
+            onClick={() => setRegistered(!registered)}
+          >
+            {registered ? "New user? " : "Existing user? "}
+            <span className="underline cursor-pointer">{registered ? "Sign Up" : "Sign In"}</span>
+          </p>
         </div>
       </div>
     </section>
