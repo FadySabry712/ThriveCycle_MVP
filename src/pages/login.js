@@ -1,8 +1,12 @@
-import axios from "axios";
+import { Client, Account, ID } from "appwrite"; // Import necessary Appwrite components
+import { createDocument } from '../lib/appwrite_with_document'; // Import createDocument function
+
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
-import { createDocument } from '../lib/appwrite_with_document'; // Import the function
+
+const client = new Client();
+const account = new Account(client);
 
 const Login = () => {
   const API_URL = process.env.API_URL;
@@ -25,51 +29,43 @@ const Login = () => {
 
   const register = async () => {
     const number = Math.random();
-    const intiger = number * 100;
+    const intiger = Math.floor(number * 100); // Ensure it's a valid integer
+
     const percentage = intiger.toString().substring(0, 4);
     try {
-      const { data } = await axios({
-        method: "post",
-        url: "https://cloud.appwrite.io/v1/databases/679f10030008b232a34e/collections/679f1028002e27e88f5e",
-        withCredentials: true,
-        headers: { "Content-Type": "application/json"},
-        data: JSON.stringify({ ...loginInfo, rc_score: percentage }),
-      });
-      console.log(data, "data");
+      console.log("Registering with data:", { name: loginInfo.name, username: loginInfo.username, password: loginInfo.password, rc_score: percentage });
+
+const response = await createDocument({ 
+    user_id: intiger, 
+    user_name: loginInfo.username, 
+    password: loginInfo.password, 
+    name: loginInfo.name 
+});
+
+
+
+
+      console.log(response);
       toast.success("You Have Been Registered");
       setLoginInfo({
         name: "",
-        user_name: "",
+        username: "",
         password: "",
       });
       setRegistered(true);
       return;
     } catch (error) {
-      // Check if error.response is defined
-      const errorMessage = error.response ? error.response.data.message : "An error occurred during registration.";
+      const errorMessage = error.response && error.response.data ? error.response.data.message : "An error occurred during registration.";
+
       toast.error(errorMessage);
     }
   };
 
   const login = async () => {
     try {
-      const { data } = await axios({
-        method: "post",
-        url: "https://cloud.appwrite.io/v1/databases/679f10030008b232a34e/collections/679f1028002e27e88f5e",
-        withCredentials: true,
-        headers: { "Content-Type": "application/json"},
-        data: JSON.stringify(loginInfo),
-      });
-
-      localStorage.setItem("userData", JSON.stringify(data));
+      const response = await account.createEmailSession(loginInfo.username, loginInfo.password);
+      localStorage.setItem("userData", JSON.stringify(response));
       toast.success("You Have Been Logged");
-
-      // Call createDocument to send user data to Appwrite database
-      await createDocument('679f10030008b232a34e', '679f1028002e27e88f5e', {
-        username: loginInfo.username,
-        name: loginInfo.name,
-      });
-
       window.location.reload();
       setRegistered(true);
       return;
