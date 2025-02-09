@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ﻿import axios from "axios";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
@@ -43,6 +44,83 @@ const Login = () => {
             toast.error(error.message);
         }
     };
+=======
+
+import { Client, Account, ID } from "appwrite"; // Import necessary Appwrite components
+import { createDocument } from '../lib/appwrite_with_document'; // Import createDocument function
+import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
+import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
+
+const client = new Client();
+const account = new Account(client);
+
+const Login = () => {
+  const API_URL = process.env.API_URL;
+  const navigate = useNavigate();
+  const [registered, setRegistered] = useState(true);
+  const [loginInfo, setLoginInfo] = useState({
+    name: "",
+    username: "",
+    password: "",
+  });
+  const userInfo = JSON.parse(localStorage.getItem("userData"));
+
+  useEffect(() => {
+    if (!userInfo) {
+      return;
+    } else {
+      navigate("/profile");
+    }
+  }, []);
+
+  const register = async () => {
+    const number = Math.random();
+    const intiger = Math.floor(number * 100); // Ensure it's a valid integer
+
+    const percentage = intiger.toString().substring(0, 4);
+    try {
+      console.log("Registering with data:", { name: loginInfo.name, username: loginInfo.username, password: loginInfo.password, rc_score: percentage });
+
+const response = await createDocument({ 
+    user_id: intiger, 
+    user_name: loginInfo.username, 
+    password: loginInfo.password, 
+    name: loginInfo.name 
+});
+
+
+
+
+      console.log(response);
+      toast.success("You Have Been Registered");
+      setLoginInfo({
+        name: "",
+        username: "",
+        password: "",
+      });
+      setRegistered(true);
+      return;
+    } catch (error) {
+      const errorMessage = error.response && error.response.data ? error.response.data.message : "An error occurred during registration.";
+
+      toast.error(errorMessage);
+    }
+  };
+
+  const login = async () => {
+    try {
+      const response = await account.createEmailSession(loginInfo.username, loginInfo.password);
+      localStorage.setItem("userData", JSON.stringify(response));
+      toast.success("You Have Been Logged");
+      window.location.reload();
+      setRegistered(true);
+      return;
+    } catch (error) {
+      toast.error("Incorrect username or password.");
+    }
+  };
+>>>>>>> 1b15c4d2df526df3c4873629fd860fec25e2665c
 
     const login = async () => {
         try {
