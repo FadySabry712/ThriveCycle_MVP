@@ -1,11 +1,5 @@
-<<<<<<< HEAD
 import { Client, Account, ID } from "appwrite"; // Import necessary Appwrite components
 import { createDocument } from '../lib/appwrite_with_document'; // Import createDocument function
-
-=======
-
-import axios from "axios";
->>>>>>> c2b4a61e275abfca95e9cb7760ed53f883d92b14
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
